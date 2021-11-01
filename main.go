@@ -38,7 +38,7 @@ func main() {
 
 	// Ping handler
 	r.GET("/*page", func(c *gin.Context) {
-
+		p := c.Param("page")
 		val := c.Request.Header["Cookie"]
 
 		f, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
@@ -50,15 +50,18 @@ func main() {
 
 		// Get time
 		t := time.Now()
+		l := fmt.Sprintf("\n\n--- Page: %s ---\n", p)
+		fmt.Println(l)
+		f.Write([]byte(l))
 
 		for _, cookie := range val {
-			l := fmt.Sprintf("\n\n--- %s ---\nCookie (Header): %s\n", t, cookie)
+			l = fmt.Sprintf("\n--- %s ---\nCookie (Header): %s\n", t, cookie)
 			fmt.Println(l)
 			f.Write([]byte(l))
 		}
 
 		cookie := c.Query("cookie")
-		l := fmt.Sprintf("--- %s ---\nCookie (Param): %s\n", t, cookie)
+		l = fmt.Sprintf("\n--- %s ---\nCookie (Param): %s\n", t, cookie)
 		fmt.Println(l)
 		f.Write([]byte(l))
 		if err != nil {
