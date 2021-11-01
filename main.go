@@ -38,7 +38,7 @@ func main() {
 	fileName := fmt.Sprintf("cookies_%s_%d_%s.txt", hostname, port, strconv.FormatInt(time.Now().UTC().UnixNano(), 10))
 
 	// Ping handler
-	r.GET("/*page", func(c *gin.Context) {
+	r.Any("/*page", func(c *gin.Context) {
 		p := c.Param("page")
 
 		req, err := httputil.DumpRequest(c.Request, true)
