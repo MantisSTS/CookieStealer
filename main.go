@@ -28,9 +28,9 @@ func main() {
 		port     int
 	)
 
-	flag.BoolVar(&useTLS, "ssl", true, "Use SSL")
+	flag.BoolVar(&useTLS, "ssl", false, "Use SSL")
 	flag.StringVar(&hostname, "hostname", "localhost", "Hostname for the server")
-	flag.IntVar(&port, "port", 443, "Port to listen on")
+	flag.IntVar(&port, "port", 80, "Port to listen on")
 	flag.Parse()
 
 	r := gin.Default()
